@@ -8,25 +8,29 @@ import json
 
 load_dotenv()
 
-#class InstaDiscoveryTool(BaseModel):
+#class InstaDiscoveryTool(BaseModel): avoid this comment
 
-def insta_search_query_generator(niche:str , location: str , keyword: str , language: str) -> json:
+    
+
+
+def lead_search_query_generator(platform:str , niche:str , location: str , keyword: str , language: str) -> json:
     """Generate Instagram search query using Google GenAI."""
     PROMPT_TEMPLATE = """
                     You are a search query generation agent.
 
-                    Your task is to generate Google/Bing search queries
+                    Your task is to generate Google search queries / dorks
                     that can be used to discover Instagram influencer profiles.
 
                     Rules:
-                    - Queries MUST target Instagram profiles only
-                    - Use site:instagram.com
+                    - Queries MUST target platform profiles only
+                    - Use site:<specified platform name>.com
                     - Include niche keywords
                     - Include optional location or language hints
                     - Avoid generic or broad queries
                     - Each query should be realistic and human-like
 
                     Input:
+                    platform: {platform}
                     Niche: {niche}
                     Keywords: {keywords}
                     Location: {location}
@@ -47,11 +51,12 @@ def insta_search_query_generator(niche:str , location: str , keyword: str , lang
 
     prompt = PromptTemplate(
         template=PROMPT_TEMPLATE,
-        input_variables=["niche", "location", "keyword" , "language"])
+        input_variables=["platform", "niche", "location", "keyword" , "language"])
 
     chain = prompt | llm | JsonOutputParser()
 
     response = chain.invoke({
+        "platform": platform,
         "niche": niche,
         "keywords": keyword,
         "location": location,
@@ -62,13 +67,14 @@ def insta_search_query_generator(niche:str , location: str , keyword: str , lang
 
 
 if __name__ == "__main__":
+    platform = input("Enter platform (e.g., instagram , x , linkedin): ")
     niche = input("Enter niche (e.g., fitness, fashion, travel): ")
     location = input("Enter location (e.g., delhi, Kolkata) or leave blank: ")
     keyword = input("Enter keyword (e.g., yoga, street style) or leave blank: ")
     language = input("Enter language (e.g., English, Spanish) or leave blank: ")
 
-    queries = insta_search_query_generator(niche, location, keyword, language)
-    print("Generated Instagram Search Queries:")
+    queries = lead_search_query_generator(platform , niche, location, keyword, language)
+    print(f"Generated {platform} Search Queries:")
     print(queries)
     print(type(queries))
 
