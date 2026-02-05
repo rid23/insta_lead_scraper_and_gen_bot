@@ -66,7 +66,7 @@ def lead_search_query_generator(platform:str , niche:str , location: str , keywo
     return response
 
 
-if __name__ == "__main__":
+def dorks():
     platform = input("Enter platform (e.g., instagram , x , linkedin): ")
     niche = input("Enter niche (e.g., fitness, fashion, travel): ")
     location = input("Enter location (e.g., delhi, Kolkata) or leave blank: ")
@@ -75,6 +75,8 @@ if __name__ == "__main__":
 
     queries = lead_search_query_generator(platform , niche, location, keyword, language)
     print(f"Generated {platform} Search Queries:")
-    print(queries)
-    print(type(queries))
-
+    #print(queries)
+    #print(type(queries))
+    return queries
+if __name__ == "__main__":
+    dorks()

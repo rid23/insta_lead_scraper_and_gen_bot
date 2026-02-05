@@ -6,7 +6,7 @@ from typing import Optional
 from playwright.sync_api import sync_playwright, Page
 import pandas as pd
 from urllib.parse import urlparse, parse_qs , urlencode
-
+from insta_dork_generator import dorks
 #this function deduplicates links and removes links with unwanted patters
 def clean_links_list(links: list[str]) -> list[str]:
     blocked_patterns = [ 
@@ -103,9 +103,11 @@ def open_google_and_type(query: str, profile_dir: str = "browser_data", headless
             number_pages_to_scrape = 10
             all_the_links= []
             for i in range(number_pages_to_scrape):
+               
                 encoded_query = urlencode({'q': query, 'start': i * 10})
                 url = f"https://www.google.com/search?{encoded_query}"
                 page.goto(url, timeout=30000)
+                time.sleep(120) # random delay before each page navigation
 
                 # Dismiss common cookie/consent dialogs if present
                 try:
@@ -152,7 +154,8 @@ def open_google_and_type(query: str, profile_dir: str = "browser_data", headless
                         print(f"{idx}: {href}")
                 except Exception:
                     pass
-
+                finally:
+                    time.sleep(random.uniform(2.0, 4.0))  # small delay between page navigations
             if headless:
                 context.close()
                 return None
@@ -169,14 +172,16 @@ def open_google_and_type(query: str, profile_dir: str = "browser_data", headless
 
 if __name__ == "__main__":
     # Demo: launches Chrome with persistent profile and performs a search.
-    query = input("Enter your Google search query for insta lead discovery: ")
-    print(f"Opening Chrome and searching for: {query}")
-    all_links = open_google_and_type(
-        query,
-        profile_dir=os.path.join(os.path.dirname(__file__), "browser_data"),
-        headless=False,
-    )
-
+    #query = input("Enter your Google search query for insta lead discovery: ")
+    dork_quesries = dorks()
+    for query in dork_quesries:
+        print(f"Opening Chrome and searching for: {query}")
+        all_links = open_google_and_type(
+            query,
+            profile_dir=os.path.join(os.path.dirname(__file__), "browser_data"),
+            headless=False,
+        )
+        time.sleep(random.uniform(2.0, 4.0))  # small delay between queries
     if all_links:
         df = pd.DataFrame({"links": all_links})
         output_file = query_to_filename(query)
